@@ -29,4 +29,47 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /resources/:id - Get a specific resource by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const resource = await Resource.findById(req.params.id).populate("category");
+    if (!resource) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+    res.json(resource);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch resource" });
+  }
+});
+
+// PUT /resources/:id - Update a specific resource by ID
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedResource = await Resource.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    ).populate("category");
+    if (!updatedResource) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+    res.json(updatedResource);
+  } catch (err) {
+    res.status(400).json({ error: "Failed to update resource" });
+  }
+});
+
+// DELETE /resources/:id - Delete a specific resource by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const deletedResource = await Resource.findByIdAndDelete(req.params.id);
+    if (!deletedResource) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+    res.json({ message: "Resource deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete resource" });
+  }
+});
+
 module.exports = router;
